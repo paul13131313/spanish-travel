@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¡Hablemos! - ペルー・ボリビア旅行スペイン語トレーナー</title>
+<meta name="description" content="ペルー・ボリビア旅行で使えるスペイン語を聴いて・声に出して・覚える学習サイト">
+<meta property="og:title" content="¡Hablemos! - ペルー・ボリビア旅行スペイン語トレーナー">
+<meta property="og:description" content="140フレーズを聴いて・声に出して・覚える。Web Speech APIで発音チェックもできる旅行スペイン語学習サイト">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://paul13131313.github.io/spanish-travel/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="¡Hablemos! - ペルー・ボリビア旅行スペイン語トレーナー">
+<meta name="twitter:description" content="140フレーズを聴いて・声に出して・覚える旅行スペイン語学習サイト">
+<meta name="twitter:image" content="https://paul13131313.github.io/spanish-travel/ogp.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗣️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sand:#F5E6D0;--sand-light:#FBF4EB;--terra:#C75B39;--terra-light:#E8845F;
+  --indigo:#2B4C7E;--indigo-light:#4A7AB5;--green:#4CAF50;--red:#E53935;
+  --text:#3E2C1C;--text-light:#7A6555;--card-shadow:0 4px 12px rgba(62,44,28,.15);
+  --radius:12px;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  font-family:'Noto Sans JP',sans-serif;color:var(--text);
+  background:var(--sand);
+  background-image:
+    radial-gradient(ellipse at 20% 50%,rgba(200,180,160,.15) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 20%,rgba(43,76,126,.05) 0%,transparent 50%);
+  min-height:100dvh;padding-bottom:70px;
+}
+h1,h2,h3,.title-font{font-family:'Caveat',cursive}
+.screen{display:none;animation:fadeIn .3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ナビゲーション */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--sand-light);border-top:2px solid rgba(62,44,28,.1);
+  display:flex;justify-content:space-around;align-items:center;
+  height:64px;z-index:100;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:none;border:none;color:var(--text-light);
+  font-size:.65rem;font-family:'Noto Sans JP',sans-serif;
+  padding:8px 12px;cursor:pointer;transition:color .2s;
+  min-width:56px;
+}
+.nav-btn .icon{font-size:1.4rem}
+.nav-btn.active{color:var(--terra)}
+
+/* ヘッダー */
+.header{
+  padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;
+}
+.header h1{font-size:1.8rem;color:var(--terra)}
+.header .subtitle{font-size:.75rem;color:var(--text-light)}
+.back-btn{
+  background:none;border:none;font-size:1.5rem;cursor:pointer;
+  color:var(--indigo);padding:8px;min-width:44px;min-height:44px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ホーム */
+.progress-card{
+  margin:8px 16px 16px;padding:16px 20px;
+  background:var(--sand-light);border-radius:var(--radius);
+  box-shadow:var(--card-shadow);position:relative;overflow:hidden;
+}
+.progress-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--terra),var(--indigo));
+}
+.progress-nums{display:flex;gap:24px;margin-top:8px}
+.progress-num{text-align:center}
+.progress-num .val{font-size:1.6rem;font-weight:700;color:var(--terra);font-family:'Caveat',cursive}
+.progress-num .label{font-size:.7rem;color:var(--text-light)}
+.progress-bar-bg{height:8px;background:rgba(62,44,28,.1);border-radius:4px;margin-top:12px}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--terra),var(--terra-light));border-radius:4px;transition:width .5s ease}
+
+.daily-phrase{
+  margin:0 16px 20px;padding:16px 20px;
+  background:linear-gradient(135deg,var(--indigo),var(--indigo-light));
+  border-radius:var(--radius);color:#fff;
+  transform:rotate(-.5deg);
+}
+.daily-phrase .tag{
+  display:inline-block;background:rgba(255,255,255,.2);
+  padding:2px 10px;border-radius:20px;font-size:.7rem;margin-bottom:8px;
+}
+.daily-phrase .es{font-family:'Caveat',cursive;font-size:1.4rem;margin-bottom:4px}
+.daily-phrase .ja{font-size:.8rem;opacity:.85}
+
+.section-title{
+  font-size:1.3rem;color:var(--text);padding:0 20px;margin-bottom:12px;
+}
+.category-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 16px;
+}
+.category-card{
+  background:var(--sand-light);border-radius:var(--radius);
+  padding:16px;cursor:pointer;box-shadow:var(--card-shadow);
+  transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.category-card:active{transform:scale(.97)}
+.category-card .emoji{font-size:2rem;margin-bottom:8px}
+.category-card .name{font-weight:700;font-size:.85rem;margin-bottom:4px}
+.category-card .count{font-size:.7rem;color:var(--text-light)}
+.category-card .tape{
+  position:absolute;top:-4px;right:8px;width:28px;height:50px;
+  background:rgba(199,91,57,.25);transform:rotate(3deg);border-radius:0 0 4px 4px;
+}
+.category-card .cat-progress{
+  height:4px;background:rgba(62,44,28,.1);border-radius:2px;margin-top:8px;
+}
+.category-card .cat-progress-fill{
+  height:100%;background:var(--green);border-radius:2px;transition:width .3s;
+}
+
+/* カテゴリ学習画面 */
+.cat-header{
+  padding:16px 20px;display:flex;align-items:center;gap:12px;
+}
+.cat-header .back-btn{padding:0}
+.cat-header .cat-emoji{font-size:2rem}
+.cat-header .cat-info h2{font-size:1.3rem;color:var(--terra)}
+.cat-header .cat-info p{font-size:.75rem;color:var(--text-light)}
+.phrase-list{padding:0 16px}
+.phrase-item{
+  background:var(--sand-light);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:10px;cursor:pointer;
+  box-shadow:0 2px 8px rgba(62,44,28,.08);
+  display:flex;align-items:center;gap:12px;
+  transition:transform .15s;
+}
+.phrase-item:active{transform:scale(.98)}
+.phrase-item .diff{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+}
+.phrase-item .diff.d1{background:#4CAF50}
+.phrase-item .diff.d2{background:#FF9800}
+.phrase-item .diff.d3{background:#E53935}
+.phrase-item .phrase-text{flex:1;min-width:0}
+.phrase-item .phrase-es{font-size:.9rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phrase-item .phrase-ja{font-size:.72rem;color:var(--text-light);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.phrase-item .learned-badge{color:var(--green);font-size:1.2rem;flex-shrink:0}
+
+/* フレーズ詳細カード */
+.phrase-detail{padding:0 16px}
+.phrase-card{
+  background:var(--sand-light);border-radius:16px;
+  padding:24px 20px;box-shadow:var(--card-shadow);
+  transform:rotate(-.3deg);margin-bottom:16px;
+  position:relative;
+}
+.phrase-card::before{
+  content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  width:60px;height:24px;background:rgba(199,91,57,.3);border-radius:0 0 6px 6px;
+}
+.phrase-card .region-tag{
+  display:inline-block;background:var(--indigo);color:#fff;
+  padding:2px 10px;border-radius:20px;font-size:.65rem;margin-bottom:12px;
+}
+.phrase-card .es-text{
+  font-family:'Caveat',cursive;font-size:1.6rem;color:var(--terra);
+  line-height:1.3;margin-bottom:8px;
+}
+.phrase-card .ja-text{font-size:.9rem;margin-bottom:12px;line-height:1.5}
+.phrase-card .pronunciation{
+  background:rgba(43,76,126,.08);border-radius:8px;padding:10px 14px;
+  margin-bottom:8px;
+}
+.phrase-card .pronunciation .label{font-size:.65rem;color:var(--indigo);font-weight:700;margin-bottom:4px}
+.phrase-card .pronunciation .kana{font-size:1rem;font-weight:500}
+.phrase-card .tip{
+  font-size:.78rem;color:var(--text-light);line-height:1.5;
+  border-left:3px solid var(--terra-light);padding-left:12px;margin-top:12px;
+}
+.phrase-card .situation{font-size:.7rem;color:var(--indigo);margin-top:8px;font-style:italic}
+
+.action-btns{
+  display:flex;gap:10px;padding:0 16px;margin-bottom:16px;
+}
+.action-btn{
+  flex:1;padding:14px;border:none;border-radius:var(--radius);
+  font-size:.85rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  min-height:50px;transition:transform .15s,opacity .15s;
+  font-family:'Noto Sans JP',sans-serif;
+}
+.action-btn:active{transform:scale(.95)}
+.btn-listen{background:var(--indigo);color:#fff}
+.btn-listen.slow{background:var(--indigo-light);color:#fff}
+.btn-speak{background:var(--terra);color:#fff}
+.btn-learned{background:var(--sand);border:2px solid var(--green);color:var(--green)}
+.btn-learned.is-learned{background:var(--green);color:#fff}
+
+.speed-toggle{
+  display:flex;gap:8px;padding:0 16px;margin-bottom:12px;
+}
+.speed-btn{
+  padding:8px 16px;border:2px solid var(--indigo);border-radius:20px;
+  background:transparent;color:var(--indigo);font-size:.75rem;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;
+}
+.speed-btn.active{background:var(--indigo);color:#fff}
+
+.phrase-nav{
+  display:flex;justify-content:space-between;padding:0 16px;margin-bottom:16px;
+}
+.phrase-nav button{
+  padding:10px 20px;border:none;border-radius:var(--radius);
+  background:var(--sand-light);color:var(--text);cursor:pointer;
+  font-size:.85rem;box-shadow:0 2px 6px rgba(62,44,28,.1);
+  font-family:'Noto Sans JP',sans-serif;min-height:44px;
+}
+.phrase-nav button:disabled{opacity:.3;cursor:default}
+.phrase-counter{
+  text-align:center;font-size:.8rem;color:var(--text-light);margin-bottom:8px;
+}
+
+/* 認識結果 */
+.recognition-result{
+  margin:0 16px 16px;padding:16px;background:var(--sand-light);
+  border-radius:var(--radius);box-shadow:var(--card-shadow);display:none;
+}
+.recognition-result.show{display:block}
+.recognition-result .score{
+  text-align:center;font-family:'Caveat',cursive;
+  font-size:2.5rem;font-weight:700;margin-bottom:4px;
+}
+.recognition-result .feedback{
+  text-align:center;font-size:1rem;margin-bottom:12px;font-weight:700;
+}
+.recognition-result .diff-display{
+  font-size:.95rem;line-height:1.8;word-break:break-all;
+}
+.diff-match{color:var(--green);font-weight:700}
+.diff-miss{color:var(--red);text-decoration:underline}
+.recording-indicator{
+  display:none;align-items:center;justify-content:center;gap:8px;
+  padding:12px;margin:0 16px 12px;color:var(--terra);font-size:.85rem;
+}
+.recording-indicator.show{display:flex}
+.recording-dot{
+  width:12px;height:12px;background:var(--red);border-radius:50%;
+  animation:pulse 1s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* 慣用句辞典 */
+.slang-search{
+  margin:0 16px 16px;position:relative;
+}
+.slang-search input{
+  width:100%;padding:12px 16px 12px 40px;border:2px solid rgba(62,44,28,.15);
+  border-radius:var(--radius);font-size:.9rem;background:var(--sand-light);
+  font-family:'Noto Sans JP',sans-serif;
+}
+.slang-search input:focus{outline:none;border-color:var(--indigo)}
+.slang-search .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem}
+.slang-filters{
+  display:flex;gap:8px;padding:0 16px;margin-bottom:16px;flex-wrap:wrap;
+}
+.filter-btn{
+  padding:6px 14px;border:2px solid rgba(62,44,28,.15);border-radius:20px;
+  background:transparent;font-size:.75rem;cursor:pointer;
+  font-family:'Noto Sans JP',sans-serif;color:var(--text);
+}
+.filter-btn.active{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.slang-list{padding:0 16px}
+.slang-item{
+  background:var(--sand-light);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 6px rgba(62,44,28,.08);
+}
+.slang-item .slang-es{font-family:'Caveat',cursive;font-size:1.3rem;color:var(--terra)}
+.slang-item .slang-ja{font-size:.85rem;margin:4px 0}
+.slang-item .slang-tip{font-size:.75rem;color:var(--text-light);line-height:1.4}
+.slang-item .slang-region{
+  display:inline-block;font-size:.65rem;padding:2px 8px;
+  border-radius:10px;margin-top:6px;
+}
+.slang-item .slang-region.peru{background:rgba(199,91,57,.15);color:var(--terra)}
+.slang-item .slang-region.bolivia{background:rgba(43,76,126,.15);color:var(--indigo)}
+.slang-item .slang-region.common{background:rgba(62,44,28,.1);color:var(--text-light)}
+
+/* 発音ドリル */
+.drill-container{padding:16px}
+.drill-score-bar{
+  display:flex;justify-content:space-around;margin-bottom:20px;
+  background:var(--sand-light);border-radius:var(--radius);padding:14px;
+  box-shadow:var(--card-shadow);
+}
+.drill-stat{text-align:center}
+.drill-stat .val{font-size:1.5rem;font-weight:700;font-family:'Caveat',cursive;color:var(--terra)}
+.drill-stat .label{font-size:.65rem;color:var(--text-light)}
+.drill-card{
+  background:var(--sand-light);border-radius:16px;padding:32px 20px;
+  text-align:center;box-shadow:var(--card-shadow);margin-bottom:20px;
+  min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.drill-card .drill-es{font-family:'Caveat',cursive;font-size:1.8rem;color:var(--terra);margin-bottom:8px}
+.drill-card .drill-ja{font-size:.85rem;color:var(--text-light)}
+.drill-actions{display:flex;gap:10px}
+.drill-actions .action-btn{min-width:0}
+.drill-result{
+  text-align:center;padding:20px;background:var(--sand-light);
+  border-radius:var(--radius);box-shadow:var(--card-shadow);display:none;
+}
+.drill-result.show{display:block}
+.streak-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:linear-gradient(135deg,#FF6B35,#FFD700);
+  color:#fff;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:700;
+}
+
+/* 祝福エフェクト */
+.confetti-container{
+  position:fixed;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:200;
+}
+.confetti{
+  position:absolute;width:8px;height:8px;border-radius:2px;
+  animation:confettiFall 1.5s ease-out forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+
+/* ヒーローセクション */
+.hero{
+  position:relative;height:220px;margin:0 16px 16px;border-radius:16px;overflow:hidden;
+  box-shadow:0 6px 20px rgba(62,44,28,.2);
+}
+.hero-img{
+  width:100%;height:100%;object-fit:cover;transition:opacity 1s ease;
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.1) 0%,rgba(0,0,0,.55) 100%);
+}
+.hero-text{
+  position:absolute;bottom:16px;left:20px;right:20px;color:#fff;
+}
+.hero-text h2{
+  font-family:'Caveat',cursive;font-size:1.6rem;
+  text-shadow:0 2px 8px rgba(0,0,0,.4);margin-bottom:4px;
+}
+.hero-text p{
+  font-size:.75rem;opacity:.9;
+  text-shadow:0 1px 4px rgba(0,0,0,.4);
+}
+.hero-dots{
+  position:absolute;bottom:8px;right:16px;display:flex;gap:6px;
+}
+.hero-dot{
+  width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.4);
+  cursor:pointer;transition:background .3s;
+}
+.hero-dot.active{background:#fff}
+
+/* レスポンシブ */
+@media(min-width:480px){
+  body{max-width:480px;margin:0 auto}
+  .bottom-nav{max-width:480px;left:50%;transform:translateX(-50%)}
+}
+</style>
+</head>
+<body>
+
+<!-- ホーム画面 -->
+<div id="home-screen" class="screen active">
+  <div class="header">
+    <div><h1 class="title-font">¡Hablemos!</h1><div class="subtitle">ペルー・ボリビア旅行スペイン語</div></div>
+  </div>
+  <div class="hero" id="hero">
+    <img class="hero-img" id="hero-img" src="" alt="ペルー・ボリビアの風景">
+    <div class="hero-overlay"></div>
+    <div class="hero-text">
+      <h2 id="hero-title"></h2>
+      <p id="hero-desc"></p>
+    </div>
+    <div class="hero-dots" id="hero-dots"></div>
+  </div>
+  <div class="progress-card">
+    <div style="font-size:.8rem;font-weight:700">今日の学習</div>
+    <div class="progress-nums">
+      <div class="progress-num"><div class="val" id="learned-count">0</div><div class="label">覚えた</div></div>
+      <div class="progress-num"><div class="val" id="total-count">0</div><div class="label">全フレーズ</div></div>
+      <div class="progress-num"><div class="val" id="drill-score">-</div><div class="label">ドリル正答率</div></div>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+  <div class="daily-phrase" id="daily-phrase"></div>
+  <div class="section-title title-font">カテゴリ</div>
+  <div class="category-grid" id="category-grid"></div>
+</div>
+
+<!-- カテゴリ学習画面 -->
+<div id="category-screen" class="screen">
+  <div class="cat-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <div class="cat-emoji" id="cat-emoji"></div>
+    <div class="cat-info"><h2 id="cat-title"></h2><p id="cat-desc"></p></div>
+  </div>
+  <div class="phrase-list" id="phrase-list"></div>
+</div>
+
+<!-- フレーズ詳細画面 -->
+<div id="phrase-screen" class="screen">
+  <div style="padding:16px 20px 8px;display:flex;align-items:center;gap:12px">
+    <button class="back-btn" onclick="goBackFromPhrase()">←</button>
+    <div class="phrase-counter" id="phrase-counter"></div>
+  </div>
+  <div class="phrase-detail" id="phrase-detail"></div>
+  <div class="speed-toggle" id="speed-toggle">
+    <button class="speed-btn active" onclick="setSpeed(1)">通常速度</button>
+    <button class="speed-btn" onclick="setSpeed(0.7)">ゆっくり</button>
+  </div>
+  <div class="action-btns" id="action-btns"></div>
+  <div class="recording-indicator" id="recording-indicator">
+    <div class="recording-dot"></div>聴いています...
+  </div>
+  <div class="recognition-result" id="recognition-result"></div>
+  <div class="phrase-nav">
+    <button id="prev-btn" onclick="navPhrase(-1)">← 前へ</button>
+    <button id="next-btn" onclick="navPhrase(1)">次へ →</button>
+  </div>
+</div>
+
+<!-- 慣用句辞典画面 -->
+<div id="slang-screen" class="screen">
+  <div class="header">
+    <div><h1 class="title-font" style="font-size:1.4rem">🇵🇪🇧🇴 慣用句辞典</h1><div class="subtitle">ペルー・ボリビアの現地表現</div></div>
+  </div>
+  <div class="slang-search">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="slang-search-input" placeholder="スペイン語 or 日本語で検索..." oninput="filterSlang()">
+  </div>
+  <div class="slang-filters" id="slang-filters">
+    <button class="filter-btn active" onclick="setSlangFilter('all')">すべて</button>
+    <button class="filter-btn" onclick="setSlangFilter('peru')">🇵🇪 ペルー</button>
+    <button class="filter-btn" onclick="setSlangFilter('bolivia')">🇧🇴 ボリビア</button>
+    <button class="filter-btn" onclick="setSlangFilter('common')">共通</button>
+  </div>
+  <div class="slang-list" id="slang-list"></div>
+</div>
+
+<!-- 発音ドリル画面 -->
+<div id="drill-screen" class="screen">
+  <div class="header">
+    <div><h1 class="title-font" style="font-size:1.4rem">🎯 発音ドリル</h1><div class="subtitle">ランダム出題モード</div></div>
+  </div>
+  <div class="drill-container">
+    <div class="drill-score-bar">
+      <div class="drill-stat"><div class="val" id="drill-correct">0</div><div class="label">正解</div></div>
+      <div class="drill-stat"><div class="val" id="drill-total">0</div><div class="label">出題数</div></div>
+      <div class="drill-stat"><div class="val" id="drill-streak">0</div><div class="label">連続🔥</div></div>
+    </div>
+    <div class="drill-card" id="drill-card"></div>
+    <div class="drill-actions">
+      <button class="action-btn btn-listen" onclick="drillListen()">🔊 聴く</button>
+      <button class="action-btn btn-speak" id="drill-speak-btn" onclick="drillSpeak()">🎤 話す</button>
+      <button class="action-btn" style="background:var(--indigo-light);color:#fff" onclick="drillSkip()">⏭ スキップ</button>
+    </div>
+    <div class="drill-result" id="drill-result"></div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="action-btn" style="background:var(--terra);color:#fff;display:inline-flex" onclick="startDrill()">新しいドリルを始める</button>
+    </div>
+  </div>
+</div>
+
+<!-- 下部ナビ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showScreen('home')"><span class="icon">🏠</span>ホーム</button>
+  <button class="nav-btn" onclick="showScreen('slang')"><span class="icon">📖</span>辞典</button>
+  <button class="nav-btn" onclick="showScreen('drill')"><span class="icon">🎯</span>ドリル</button>
+</nav>
+
+<div class="confetti-container" id="confetti-container"></div>
+
+<script>
+// ===================== フレーズデータ =====================
+const CATEGORIES = [
+  {id:'airport',emoji:'🛬',name:'空港・移動',desc:'チェックイン、タクシー、バス'},
+  {id:'hotel',emoji:'🏨',name:'宿泊',desc:'チェックイン/アウト、設備'},
+  {id:'food',emoji:'🍽️',name:'食事',desc:'注文、会計、アレルギー'},
+  {id:'shopping',emoji:'🛒',name:'買い物・市場',desc:'値段交渉、サイズ'},
+  {id:'daily',emoji:'🗣️',name:'日常会話',desc:'挨拶、自己紹介'},
+  {id:'emergency',emoji:'🆘',name:'緊急・トラブル',desc:'病院、警察、盗難'},
+  {id:'sightseeing',emoji:'📸',name:'観光',desc:'写真、おすすめスポット'},
+  {id:'friends',emoji:'🤝',name:'仲良くなる',desc:'褒める、感謝、SNS交換'},
+  {id:'slang',emoji:'🇵🇪',name:'現地スラング',desc:'ペルー/ボリビア特有表現'}
+];
+
+const PHRASES = [
+  // ===== 空港・移動 (15) =====
+  {id:'airport_01',category:'airport',es:'¿Dónde puedo tomar un taxi?',ja:'タクシーはどこで乗れますか？',pronunciation:'ドンデ・プエド・トマール・ウン・タクシ？',tip:'「tomar」は中南米で「乗る」の意味。スペインでは「coger」だが中南米では別の意味になるので注意',difficulty:1,region:'common',situation:'空港の到着ロビーで'},
+  {id:'airport_02',category:'airport',es:'¿Cuánto cuesta ir al centro de la ciudad?',ja:'市内中心部まではいくらですか？',pronunciation:'クアント・クエスタ・イール・アル・セントロ・デ・ラ・シウダッ？',tip:'タクシーに乗る前に必ず値段を確認。メーターがない場合も多い',difficulty:1,region:'common',situation:'タクシー乗り場で運転手に'},
+  {id:'airport_03',category:'airport',es:'¿Dónde está la parada de autobús?',ja:'バス停はどこですか？',pronunciation:'ドンデ・エスタ・ラ・パラダ・デ・アウトブス？',tip:'ペルーでは「paradero」とも言う',difficulty:1,region:'common',situation:'空港や街中で'},
+  {id:'airport_04',category:'airport',es:'¿Este bus va a Miraflores?',ja:'このバスはミラフローレスに行きますか？',pronunciation:'エステ・ブス・バ・ア・ミラフローレス？',tip:'リマの人気エリア名を入れ替えて使える万能フレーズ',difficulty:1,region:'peru',situation:'バスに乗る前に運転手か車掌に'},
+  {id:'airport_05',category:'airport',es:'¿Me puede llevar a esta dirección, por favor?',ja:'この住所まで連れて行ってもらえますか？',pronunciation:'メ・プエデ・ジェバール・ア・エスタ・ディレクシオン・ポルファボール？',tip:'スマホの地図を見せながら言うと確実',difficulty:2,region:'common',situation:'タクシー運転手に住所を見せて'},
+  {id:'airport_06',category:'airport',es:'¿A qué hora sale el próximo bus a Cusco?',ja:'クスコ行きの次のバスは何時発ですか？',pronunciation:'ア・ケ・オラ・サレ・エル・プロキシモ・ブス・ア・クスコ？',tip:'長距離バスのターミナルで。ペルーはバス移動が主流',difficulty:2,region:'common',situation:'バスターミナルの窓口で'},
+  {id:'airport_07',category:'airport',es:'Quiero un pasaje a La Paz, por favor.',ja:'ラパス行きのチケットを1枚ください。',pronunciation:'キエロ・ウン・パサヘ・ア・ラ・パス・ポルファボール',tip:'「pasaje」はチケットの意味。「boleto」も使える',difficulty:1,region:'common',situation:'バスターミナルの窓口で'},
+  {id:'airport_08',category:'airport',es:'¿Tiene asiento de ventana?',ja:'窓側の席はありますか？',pronunciation:'ティエネ・アシエント・デ・ベンタナ？',tip:'長距離バスでは景色が楽しめる窓側がおすすめ',difficulty:2,region:'common',situation:'チケット購入時に'},
+  {id:'airport_09',category:'airport',es:'¿Dónde puedo cambiar dinero?',ja:'両替はどこでできますか？',pronunciation:'ドンデ・プエド・カンビアール・ディネロ？',tip:'空港より街中の両替所の方がレートが良いことが多い',difficulty:1,region:'common',situation:'空港の到着ロビーで'},
+  {id:'airport_10',category:'airport',es:'Pare aquí, por favor.',ja:'ここで止めてください。',pronunciation:'パレ・アキ・ポルファボール',tip:'タクシーで降りたい場所に着いたとき。短くて覚えやすい',difficulty:1,region:'common',situation:'タクシーの中で'},
+  {id:'airport_11',category:'airport',es:'¿Cuánto tiempo demora llegar?',ja:'到着までどのくらいかかりますか？',pronunciation:'クアント・ティエンポ・デモラ・ジェガール？',tip:'「demora」は中南米でよく使う。スペインでは「tarda」',difficulty:2,region:'common',situation:'タクシーやバスの中で'},
+  {id:'airport_12',category:'airport',es:'¿Me puede dar un recibo?',ja:'領収書をもらえますか？',pronunciation:'メ・プエデ・ダール・ウン・レシーボ？',tip:'ビジネス旅行や経費精算に必要な場合に',difficulty:2,region:'common',situation:'タクシーを降りるとき'},
+  {id:'airport_13',category:'airport',es:'¿Dónde está la sala de espera?',ja:'待合室はどこですか？',pronunciation:'ドンデ・エスタ・ラ・サラ・デ・エスペラ？',tip:'バスターミナルや空港で使える',difficulty:1,region:'common',situation:'バスターミナルで'},
+  {id:'airport_14',category:'airport',es:'¿Hay colectivo a Ollantaytambo?',ja:'オリャンタイタンボ行きの乗合バンはありますか？',pronunciation:'アイ・コレクティーボ・ア・オジャンタイタンボ？',tip:'「colectivo」は乗合バン。ペルーの地方移動では必須',difficulty:2,region:'peru',situation:'街中やバスターミナルで'},
+  {id:'airport_15',category:'airport',es:'No tengo cambio, ¿puede cambiar?',ja:'お釣りがないんですが、崩してもらえますか？',pronunciation:'ノ・テンゴ・カンビオ・プエデ・カンビアール？',tip:'大きいお札しかないとき。中南米では小銭が不足しがち',difficulty:2,region:'common',situation:'タクシーや売店で'},
+
+  // ===== 宿泊 (15) =====
+  {id:'hotel_01',category:'hotel',es:'Tengo una reservación a nombre de...',ja:'〜の名前で予約しています。',pronunciation:'テンゴ・ウナ・レセルバシオン・ア・ノンブレ・デ...',tip:'自分の名前を最後に付け足す。予約確認メールを見せるとスムーズ',difficulty:1,region:'common',situation:'ホテルのフロントで'},
+  {id:'hotel_02',category:'hotel',es:'¿Tiene habitación disponible para esta noche?',ja:'今夜空いている部屋はありますか？',pronunciation:'ティエネ・アビタシオン・ディスポニブレ・パラ・エスタ・ノチェ？',tip:'予約なしで飛び込みするときに。値段交渉も忘れずに',difficulty:2,region:'common',situation:'宿に飛び込みで'},
+  {id:'hotel_03',category:'hotel',es:'¿Cuánto cuesta por noche?',ja:'1泊いくらですか？',pronunciation:'クアント・クエスタ・ポル・ノチェ？',tip:'料金の基本フレーズ。朝食込みかも確認しよう',difficulty:1,region:'common',situation:'宿のフロントで'},
+  {id:'hotel_04',category:'hotel',es:'¿El desayuno está incluido?',ja:'朝食は含まれていますか？',pronunciation:'エル・デサジュノ・エスタ・インクルイド？',tip:'ペルー・ボリビアの安宿は朝食付きが多い',difficulty:1,region:'common',situation:'チェックイン時に'},
+  {id:'hotel_05',category:'hotel',es:'¿Cuál es la contraseña del Wi-Fi?',ja:'Wi-Fiのパスワードは何ですか？',pronunciation:'クアル・エス・ラ・コントラセニャ・デル・ワイファイ？',tip:'「contraseña」＝パスワード。旅行者が最も使うフレーズの一つ',difficulty:1,region:'common',situation:'チェックイン後にフロントで'},
+  {id:'hotel_06',category:'hotel',es:'No sale agua caliente en la ducha.',ja:'シャワーからお湯が出ません。',pronunciation:'ノ・サレ・アグア・カリエンテ・エン・ラ・ドゥチャ',tip:'安宿あるある。「agua caliente」＝お湯',difficulty:2,region:'common',situation:'部屋のトラブルをフロントに報告'},
+  {id:'hotel_07',category:'hotel',es:'¿Puede darme otra toalla?',ja:'タオルをもう1枚もらえますか？',pronunciation:'プエデ・ダルメ・オトラ・トアジャ？',tip:'「toalla」の「ll」は中南米では「ジャ」と発音',difficulty:1,region:'common',situation:'フロントに電話で'},
+  {id:'hotel_08',category:'hotel',es:'¿A qué hora es el check-out?',ja:'チェックアウトは何時ですか？',pronunciation:'ア・ケ・オラ・エス・エル・チェックアウト？',tip:'「check-out」はそのまま英語で通じる',difficulty:1,region:'common',situation:'チェックイン時に確認'},
+  {id:'hotel_09',category:'hotel',es:'¿Puedo dejar mi equipaje aquí?',ja:'荷物をここに預けられますか？',pronunciation:'プエド・デハール・ミ・エキパヘ・アキ？',tip:'チェックアウト後に観光したいとき。「equipaje」＝荷物',difficulty:2,region:'common',situation:'チェックアウト時に'},
+  {id:'hotel_10',category:'hotel',es:'¿Hay agua caliente todo el día?',ja:'1日中お湯は出ますか？',pronunciation:'アイ・アグア・カリエンテ・トド・エル・ディア？',tip:'安宿ではお湯が出る時間帯が限られることがある',difficulty:2,region:'common',situation:'チェックイン前に確認'},
+  {id:'hotel_11',category:'hotel',es:'La puerta no cierra bien.',ja:'ドアがちゃんと閉まりません。',pronunciation:'ラ・プエルタ・ノ・シエラ・ビエン',tip:'セキュリティに関わる問題はすぐ報告',difficulty:2,region:'common',situation:'部屋のトラブルをフロントに'},
+  {id:'hotel_12',category:'hotel',es:'¿Tiene habitación más barata?',ja:'もっと安い部屋はありますか？',pronunciation:'ティエネ・アビタシオン・マス・バラタ？',tip:'予算に合わないときに。交渉は基本',difficulty:1,region:'common',situation:'料金を聞いた後に'},
+  {id:'hotel_13',category:'hotel',es:'Quiero quedarme una noche más.',ja:'もう1泊延泊したいです。',pronunciation:'キエロ・ケダルメ・ウナ・ノチェ・マス',tip:'気に入った街に長く滞在したいときに',difficulty:2,region:'common',situation:'フロントで'},
+  {id:'hotel_14',category:'hotel',es:'¿Dónde puedo lavar mi ropa?',ja:'洗濯はどこでできますか？',pronunciation:'ドンデ・プエド・ラバール・ミ・ロパ？',tip:'長期旅行では必須。「lavandería」（ランドリー）が近くにあるか聞こう',difficulty:1,region:'common',situation:'フロントで'},
+  {id:'hotel_15',category:'hotel',es:'¿Me puede llamar un taxi para mañana a las 6?',ja:'明日朝6時にタクシーを呼んでもらえますか？',pronunciation:'メ・プエデ・ジャマール・ウン・タクシ・パラ・マニャナ・ア・ラス・セイス？',tip:'早朝のフライトやツアーの出発に。前日に頼んでおくと安心',difficulty:2,region:'common',situation:'フロントで前日に'},
+
+  // ===== 食事 (16) =====
+  {id:'food_01',category:'food',es:'¿Me puede recomendar algo típico de aquí?',ja:'この地域の名物料理をおすすめしてもらえますか？',pronunciation:'メ・プエデ・レコメンダール・アルゴ・ティピコ・デ・アキ？',tip:'地元の食べ物を聞くときの鉄板フレーズ',difficulty:2,region:'common',situation:'レストランで店員に'},
+  {id:'food_02',category:'food',es:'La cuenta, por favor.',ja:'お会計をお願いします。',pronunciation:'ラ・クエンタ・ポルファボール',tip:'食事の最後に。チップは10%程度が一般的',difficulty:1,region:'common',situation:'食事の最後に'},
+  {id:'food_03',category:'food',es:'¿Qué tiene el menú del día?',ja:'今日の定食は何がありますか？',pronunciation:'ケ・ティエネ・エル・メヌ・デル・ディア？',tip:'「menú del día」は定食。ペルーでは安くてボリュームたっぷり',difficulty:1,region:'common',situation:'食堂で'},
+  {id:'food_04',category:'food',es:'Soy alérgico al maní.',ja:'ピーナッツアレルギーです。',pronunciation:'ソイ・アレルヒコ・アル・マニ',tip:'女性は「alérgica」。アレルゲン名を入れ替えて使う',difficulty:2,region:'common',situation:'注文前に店員に'},
+  {id:'food_05',category:'food',es:'Sin picante, por favor.',ja:'辛くしないでください。',pronunciation:'シン・ピカンテ・ポルファボール',tip:'ペルー料理は「ají」（唐辛子）を多用する。辛いのが苦手なら必須',difficulty:1,region:'common',situation:'注文時に'},
+  {id:'food_06',category:'food',es:'¿Tiene algo vegetariano?',ja:'ベジタリアン向けのものはありますか？',pronunciation:'ティエネ・アルゴ・ベヘタリアノ？',tip:'中南米は肉料理が多いので、事前に聞くと安心',difficulty:1,region:'common',situation:'レストランで'},
+  {id:'food_07',category:'food',es:'Un ceviche, por favor.',ja:'セビーチェを1つください。',pronunciation:'ウン・セビーチェ・ポルファボール',tip:'ペルーの国民的料理。新鮮な魚のマリネ',difficulty:1,region:'peru',situation:'セビチェリア（セビーチェ専門店）で'},
+  {id:'food_08',category:'food',es:'¿Me trae un vaso de agua, por favor?',ja:'水を1杯持ってきてもらえますか？',pronunciation:'メ・トラエ・ウン・バソ・デ・アグア・ポルファボール？',tip:'必ず「agua sin gas」（炭酸なし）か「con gas」（炭酸あり）を指定',difficulty:1,region:'common',situation:'レストランで'},
+  {id:'food_09',category:'food',es:'Está riquísimo.',ja:'とてもおいしいです。',pronunciation:'エスタ・リキシモ',tip:'料理を褒めるフレーズ。「rico」の最上級。店員が喜ぶ',difficulty:1,region:'common',situation:'食事中に感想を聞かれたとき'},
+  {id:'food_10',category:'food',es:'¿Puedo ver el menú?',ja:'メニューを見せてもらえますか？',pronunciation:'プエド・ベール・エル・メヌ？',tip:'席に着いたらまずこのフレーズ',difficulty:1,region:'common',situation:'レストランに入ったとき'},
+  {id:'food_11',category:'food',es:'Quiero probar el lomo saltado.',ja:'ロモ・サルタードを食べてみたいです。',pronunciation:'キエロ・プロバール・エル・ロモ・サルタード',tip:'ペルーの人気料理。牛肉と野菜の炒め物',difficulty:2,region:'peru',situation:'レストランで注文時'},
+  {id:'food_12',category:'food',es:'¿Aceptan tarjeta?',ja:'カードは使えますか？',pronunciation:'アセプタン・タルヘタ？',tip:'地元の食堂は現金のみが多い。事前確認推奨',difficulty:1,region:'common',situation:'注文前やお会計時'},
+  {id:'food_13',category:'food',es:'Para llevar, por favor.',ja:'持ち帰りでお願いします。',pronunciation:'パラ・ジェバール・ポルファボール',tip:'テイクアウトの定番フレーズ',difficulty:1,region:'common',situation:'注文時に'},
+  {id:'food_14',category:'food',es:'¿Qué jugo tiene?',ja:'ジュースは何がありますか？',pronunciation:'ケ・フゴ・ティエネ？',tip:'ペルー・ボリビアはフレッシュジュース天国',difficulty:1,region:'common',situation:'ジュース屋で'},
+  {id:'food_15',category:'food',es:'Un jugo de maracuyá, por favor.',ja:'マラクヤ（パッションフルーツ）ジュースをください。',pronunciation:'ウン・フゴ・デ・マラクジャ・ポルファボール',tip:'南米の定番フルーツ。甘酸っぱくて美味しい',difficulty:1,region:'common',situation:'ジュース屋やレストランで'},
+  {id:'food_16',category:'food',es:'¿Tiene salteña?',ja:'サルテーニャ（ボリビア風エンパナーダ）はありますか？',pronunciation:'ティエネ・サルテニャ？',tip:'ボリビアの朝ごはんの定番。甘めの生地に具がたっぷり',difficulty:1,region:'bolivia',situation:'朝の屋台や食堂で'},
+
+  // ===== 買い物・市場 (15) =====
+  {id:'shopping_01',category:'shopping',es:'¿Cuánto cuesta esto?',ja:'これはいくらですか？',pronunciation:'クアント・クエスタ・エスト？',tip:'買い物の最重要フレーズ。指差しながら使う',difficulty:1,region:'common',situation:'市場や店で商品を指して'},
+  {id:'shopping_02',category:'shopping',es:'¿Me puede hacer un descuento?',ja:'割引してもらえますか？',pronunciation:'メ・プエデ・アセール・ウン・デスクエント？',tip:'市場では値段交渉が基本。笑顔で聞こう',difficulty:2,region:'common',situation:'市場で値段を聞いた後'},
+  {id:'shopping_03',category:'shopping',es:'Muy caro. ¿No tiene algo más barato?',ja:'高すぎます。もっと安いのはありますか？',pronunciation:'ムイ・カロ。ノ・ティエネ・アルゴ・マス・バラト？',tip:'値段交渉の第一歩。相場を知っておくと有利',difficulty:1,region:'common',situation:'値段を聞いて高いと思ったとき'},
+  {id:'shopping_04',category:'shopping',es:'¿Tiene talla más grande?',ja:'もっと大きいサイズはありますか？',pronunciation:'ティエネ・タジャ・マス・グランデ？',tip:'「más pequeño」で小さいサイズも聞ける',difficulty:1,region:'common',situation:'服屋で試着後'},
+  {id:'shopping_05',category:'shopping',es:'Solo estoy mirando, gracias.',ja:'見ているだけです、ありがとう。',pronunciation:'ソロ・エストイ・ミランド・グラシアス',tip:'しつこい店員を丁寧に断るフレーズ',difficulty:1,region:'common',situation:'店で声をかけられたとき'},
+  {id:'shopping_06',category:'shopping',es:'Me llevo este.',ja:'これをもらいます。',pronunciation:'メ・ジェボ・エステ',tip:'購入を決めたときに。「estos」で複数も可',difficulty:1,region:'common',situation:'商品を選んだ後'},
+  {id:'shopping_07',category:'shopping',es:'¿Tiene en otro color?',ja:'他の色はありますか？',pronunciation:'ティエネ・エン・オトロ・コロール？',tip:'アルパカ製品はカラーバリエーションが豊富',difficulty:1,region:'common',situation:'お土産屋で'},
+  {id:'shopping_08',category:'shopping',es:'Si compro dos, ¿me hace precio?',ja:'2つ買ったら安くなりますか？',pronunciation:'シ・コンプロ・ドス・メ・アセ・プレシオ？',tip:'まとめ買い交渉。市場では効果的',difficulty:2,region:'common',situation:'市場で'},
+  {id:'shopping_09',category:'shopping',es:'¿Es hecho a mano?',ja:'手作りですか？',pronunciation:'エス・エチョ・ア・マノ？',tip:'ペルー・ボリビアの工芸品は手作りが多い。品質の確認に',difficulty:1,region:'common',situation:'工芸品店で'},
+  {id:'shopping_10',category:'shopping',es:'¿De qué material es?',ja:'何の素材でできていますか？',pronunciation:'デ・ケ・マテリアル・エス？',tip:'アルパカかリャマか確認したいときに',difficulty:2,region:'common',situation:'織物や衣類を見て'},
+  {id:'shopping_11',category:'shopping',es:'¿Puedo probármelo?',ja:'試着してもいいですか？',pronunciation:'プエド・プロバールメロ？',tip:'服を買うときは必ず試着。サイズ感が日本と違う',difficulty:2,region:'common',situation:'服屋で'},
+  {id:'shopping_12',category:'shopping',es:'Le doy diez soles.',ja:'10ソルでどうですか。',pronunciation:'レ・ドイ・ディエス・ソレス',tip:'ペルーの通貨は「sol（ソル）」複数形は「soles」。金額を変えて使う',difficulty:2,region:'peru',situation:'市場で値段交渉中'},
+  {id:'shopping_13',category:'shopping',es:'¿Dónde está el mercado?',ja:'市場はどこですか？',pronunciation:'ドンデ・エスタ・エル・メルカド？',tip:'地元の市場は安くて面白い。観光の醍醐味',difficulty:1,region:'common',situation:'街中で地元の人に'},
+  {id:'shopping_14',category:'shopping',es:'¿Esto es de alpaca?',ja:'これはアルパカ製ですか？',pronunciation:'エスト・エス・デ・アルパカ？',tip:'偽物（アクリル製）も多いので確認。本物は軽くて柔らかい',difficulty:1,region:'common',situation:'お土産屋で'},
+  {id:'shopping_15',category:'shopping',es:'¿Tiene bolsa?',ja:'袋はありますか？',pronunciation:'ティエネ・ボルサ？',tip:'エコバッグを持参するのがベター',difficulty:1,region:'common',situation:'購入後に'},
+
+  // ===== 日常会話 (16) =====
+  {id:'daily_01',category:'daily',es:'¡Hola! ¿Cómo estás?',ja:'こんにちは！元気ですか？',pronunciation:'オラ！コモ・エスタス？',tip:'最も基本的な挨拶。「¿Cómo está?」は丁寧な形',difficulty:1,region:'common',situation:'誰にでも使える挨拶'},
+  {id:'daily_02',category:'daily',es:'Soy de Japón.',ja:'日本から来ました。',pronunciation:'ソイ・デ・ハポン',tip:'自己紹介の定番。「Japón」はハポンと発音',difficulty:1,region:'common',situation:'自己紹介で'},
+  {id:'daily_03',category:'daily',es:'Me llamo...',ja:'私の名前は〜です。',pronunciation:'メ・ジャモ...',tip:'名前を言うとき。「ll」はジャ行で発音',difficulty:1,region:'common',situation:'自己紹介で'},
+  {id:'daily_04',category:'daily',es:'Mucho gusto.',ja:'はじめまして。',pronunciation:'ムチョ・グスト',tip:'初対面の挨拶。握手しながら言うのが一般的',difficulty:1,region:'common',situation:'初めて会う人に'},
+  {id:'daily_05',category:'daily',es:'No hablo bien español, pero estoy aprendiendo.',ja:'スペイン語はまだ上手じゃないけど、勉強中です。',pronunciation:'ノ・アブロ・ビエン・エスパニョール・ペロ・エストイ・アプレンディエンド',tip:'これを言うと相手がゆっくり話してくれることが多い',difficulty:2,region:'common',situation:'会話が始まるときに'},
+  {id:'daily_06',category:'daily',es:'¿Puede hablar más despacio?',ja:'もっとゆっくり話してもらえますか？',pronunciation:'プエデ・アブラール・マス・デスパシオ？',tip:'相手が早すぎるときに。遠慮なく使おう',difficulty:1,region:'common',situation:'相手の話が速いとき'},
+  {id:'daily_07',category:'daily',es:'No entiendo.',ja:'わかりません。',pronunciation:'ノ・エンティエンド',tip:'理解できないときに正直に言うのが大事',difficulty:1,region:'common',situation:'相手の話が理解できないとき'},
+  {id:'daily_08',category:'daily',es:'¿Qué significa esto?',ja:'これはどういう意味ですか？',pronunciation:'ケ・シグニフィカ・エスト？',tip:'看板やメニューの意味がわからないときに',difficulty:1,region:'common',situation:'わからない単語を見つけたとき'},
+  {id:'daily_09',category:'daily',es:'¿Dónde está el baño?',ja:'トイレはどこですか？',pronunciation:'ドンデ・エスタ・エル・バニョ？',tip:'中南米では「baño」が一般的。「servicio」も通じる',difficulty:1,region:'common',situation:'レストランや公共施設で'},
+  {id:'daily_10',category:'daily',es:'Muchas gracias, eres muy amable.',ja:'ありがとう、とても親切ですね。',pronunciation:'ムチャス・グラシアス・エレス・ムイ・アマブレ',tip:'感謝+褒め言葉。現地の人との距離が縮まる',difficulty:1,region:'common',situation:'助けてもらったときに'},
+  {id:'daily_11',category:'daily',es:'¿Me puede tomar una foto?',ja:'写真を撮ってもらえますか？',pronunciation:'メ・プエデ・トマール・ウナ・フォト？',tip:'カメラを渡しながら言う。「tomar」は中南米で写真を撮る意味',difficulty:1,region:'common',situation:'観光地で'},
+  {id:'daily_12',category:'daily',es:'Con permiso.',ja:'すみません（通してください）。',pronunciation:'コン・ペルミソ',tip:'人混みを通るとき。バスの中でもよく使う',difficulty:1,region:'common',situation:'人の前を通るとき'},
+  {id:'daily_13',category:'daily',es:'Disculpe, ¿tiene hora?',ja:'すみません、今何時ですか？',pronunciation:'ディスクルペ・ティエネ・オラ？',tip:'「Disculpe」は丁寧な「すみません」',difficulty:1,region:'common',situation:'街中で'},
+  {id:'daily_14',category:'daily',es:'Estoy viajando por un mes.',ja:'1ヶ月旅行しています。',pronunciation:'エストイ・ビアハンド・ポル・ウン・メス',tip:'旅行の期間を伝えるとき。「dos semanas」＝2週間',difficulty:2,region:'common',situation:'現地の人との会話で'},
+  {id:'daily_15',category:'daily',es:'¿Me puede ayudar?',ja:'助けてもらえますか？',pronunciation:'メ・プエデ・アジュダール？',tip:'困ったときの万能フレーズ',difficulty:1,region:'common',situation:'道に迷ったときなど'},
+  {id:'daily_16',category:'daily',es:'Nos vemos. ¡Que te vaya bien!',ja:'またね。うまくいくといいね！',pronunciation:'ノス・ベモス。ケ・テ・バジャ・ビエン！',tip:'友達への別れの挨拶。温かい表現',difficulty:2,region:'common',situation:'知り合った人と別れるとき'},
+
+  // ===== 緊急・トラブル (15) =====
+  {id:'emergency_01',category:'emergency',es:'¡Ayuda!',ja:'助けて！',pronunciation:'アジューダ！',tip:'緊急時の叫び。大声で',difficulty:1,region:'common',situation:'危険な状況で'},
+  {id:'emergency_02',category:'emergency',es:'Necesito un doctor.',ja:'医者が必要です。',pronunciation:'ネセシト・ウン・ドクトール',tip:'体調が悪いときに。ホテルのフロントに伝えて',difficulty:1,region:'common',situation:'体調不良時'},
+  {id:'emergency_03',category:'emergency',es:'Me robaron la cartera.',ja:'財布を盗まれました。',pronunciation:'メ・ロバロン・ラ・カルテラ',tip:'警察への報告時に。「cartera」＝財布',difficulty:2,region:'common',situation:'警察署で'},
+  {id:'emergency_04',category:'emergency',es:'¿Dónde está la comisaría más cercana?',ja:'最寄りの警察署はどこですか？',pronunciation:'ドンデ・エスタ・ラ・コミサリア・マス・セルカナ？',tip:'「comisaría」＝警察署。盗難の際は報告書が必要',difficulty:2,region:'common',situation:'トラブル後に近くの人に'},
+  {id:'emergency_05',category:'emergency',es:'Estoy perdido/a.',ja:'道に迷いました。',pronunciation:'エストイ・ペルディド（男）/ペルディダ（女）',tip:'性別で語尾が変わる。地図を見せて助けを求めよう',difficulty:1,region:'common',situation:'道に迷ったとき'},
+  {id:'emergency_06',category:'emergency',es:'Me siento mal. Creo que es el mal de altura.',ja:'具合が悪いです。高山病だと思います。',pronunciation:'メ・シエント・マル。クレオ・ケ・エス・エル・マル・デ・アルトゥラ',tip:'ラパスやクスコは標高が高い。到着初日は特に注意',difficulty:2,region:'common',situation:'高地で体調不良のとき'},
+  {id:'emergency_07',category:'emergency',es:'¿Tiene pastillas para el dolor de cabeza?',ja:'頭痛薬はありますか？',pronunciation:'ティエネ・パスティジャス・パラ・エル・ドロール・デ・カベサ？',tip:'薬局（farmacia）で。高山病の頭痛にも',difficulty:2,region:'common',situation:'薬局で'},
+  {id:'emergency_08',category:'emergency',es:'Tengo diarrea.',ja:'下痢をしています。',pronunciation:'テンゴ・ディアレア',tip:'旅行者の胃腸トラブルは多い。水に注意',difficulty:2,region:'common',situation:'薬局や病院で'},
+  {id:'emergency_09',category:'emergency',es:'Necesito llamar a mi embajada.',ja:'大使館に連絡する必要があります。',pronunciation:'ネセシト・ジャマール・ア・ミ・エンバハダ',tip:'パスポート紛失時など。在ペルー日本大使館の番号を控えておこう',difficulty:3,region:'common',situation:'重大なトラブル時'},
+  {id:'emergency_10',category:'emergency',es:'¡Cuidado!',ja:'危ない！/気をつけて！',pronunciation:'クイダード！',tip:'危険を知らせるとき。短くて覚えやすい',difficulty:1,region:'common',situation:'危険を察知したとき'},
+  {id:'emergency_11',category:'emergency',es:'No me siento bien. ¿Hay un hospital cerca?',ja:'気分が悪いです。近くに病院はありますか？',pronunciation:'ノ・メ・シエント・ビエン。アイ・ウン・オスピタル・セルカ？',tip:'「hospital」の「h」は発音しない',difficulty:2,region:'common',situation:'体調不良で'},
+  {id:'emergency_12',category:'emergency',es:'Perdí mi pasaporte.',ja:'パスポートをなくしました。',pronunciation:'ペルディ・ミ・パサポルテ',tip:'すぐに大使館に連絡。コピーを別に保管しておくと安心',difficulty:2,region:'common',situation:'紛失に気づいたとき'},
+  {id:'emergency_13',category:'emergency',es:'¿Puede llamar a una ambulancia?',ja:'救急車を呼んでもらえますか？',pronunciation:'プエデ・ジャマール・ア・ウナ・アンブランシア？',tip:'ペルーの救急番号は116、ボリビアは118',difficulty:2,region:'common',situation:'重傷や重病のとき'},
+  {id:'emergency_14',category:'emergency',es:'Soy alérgico a la penicilina.',ja:'ペニシリンアレルギーです。',pronunciation:'ソイ・アレルヒコ・ア・ラ・ペニシリナ',tip:'病院で必ず伝えること。アレルギー情報はメモしておこう',difficulty:3,region:'common',situation:'病院での問診時'},
+  {id:'emergency_15',category:'emergency',es:'¿Dónde está la farmacia más cercana?',ja:'最寄りの薬局はどこですか？',pronunciation:'ドンデ・エスタ・ラ・ファルマシア・マス・セルカナ？',tip:'南米の薬局は処方箋なしで買える薬が多い',difficulty:1,region:'common',situation:'体調不良のとき'},
+
+  // ===== 観光 (15) =====
+  {id:'sight_01',category:'sightseeing',es:'¿Cuánto cuesta la entrada?',ja:'入場料はいくらですか？',pronunciation:'クアント・クエスタ・ラ・エントラダ？',tip:'観光地の入口で。学生割引があるか聞いてみよう',difficulty:1,region:'common',situation:'観光地のチケット売り場で'},
+  {id:'sight_02',category:'sightseeing',es:'¿Hay guía en japonés?',ja:'日本語のガイドはありますか？',pronunciation:'アイ・ギア・エン・ハポネス？',tip:'主要な遺跡にはある場合も。なければ英語を聞こう',difficulty:1,region:'common',situation:'観光地の入口で'},
+  {id:'sight_03',category:'sightseeing',es:'¿Me puede tomar una foto aquí?',ja:'ここで写真を撮ってもらえますか？',pronunciation:'メ・プエデ・トマール・ウナ・フォト・アキ？',tip:'スマホを渡して構図を指定しよう',difficulty:1,region:'common',situation:'観光スポットで'},
+  {id:'sight_04',category:'sightseeing',es:'¿Qué lugar me recomienda visitar?',ja:'どこを訪れるのがおすすめですか？',pronunciation:'ケ・ルガール・メ・レコミエンダ・ビシタール？',tip:'地元の人のおすすめは観光ガイドに載っていない穴場が多い',difficulty:2,region:'common',situation:'ホテルのスタッフや地元の人に'},
+  {id:'sight_05',category:'sightseeing',es:'¿A qué hora abre el museo?',ja:'博物館は何時に開きますか？',pronunciation:'ア・ケ・オラ・アブレ・エル・ムセオ？',tip:'「cierra」に変えれば閉館時間も聞ける',difficulty:1,region:'common',situation:'博物館の前で'},
+  {id:'sight_06',category:'sightseeing',es:'¿Se puede entrar a Machu Picchu sin guía?',ja:'マチュピチュはガイドなしで入れますか？',pronunciation:'セ・プエデ・エントラール・ア・マチュピチュ・シン・ギア？',tip:'2024年以降はガイド必須になった。事前確認を',difficulty:2,region:'peru',situation:'マチュピチュ訪問前に'},
+  {id:'sight_07',category:'sightseeing',es:'¿Cuánto dura el tour?',ja:'ツアーはどのくらいの時間ですか？',pronunciation:'クアント・ドゥラ・エル・トゥール？',tip:'ツアー申込前に所要時間を確認',difficulty:1,region:'common',situation:'ツアー会社で'},
+  {id:'sight_08',category:'sightseeing',es:'¿El tour incluye almuerzo?',ja:'ツアーに昼食は含まれていますか？',pronunciation:'エル・トゥール・インクルジェ・アルムエルソ？',tip:'含まれない場合は自分で用意が必要',difficulty:2,region:'common',situation:'ツアー申込時に'},
+  {id:'sight_09',category:'sightseeing',es:'¿Es seguro caminar por aquí de noche?',ja:'ここは夜歩いても安全ですか？',pronunciation:'エス・セグロ・カミナール・ポル・アキ・デ・ノチェ？',tip:'安全確認は大事。地元の人やホテルに聞こう',difficulty:2,region:'common',situation:'初めての街で'},
+  {id:'sight_10',category:'sightseeing',es:'Quiero ir al Salar de Uyuni.',ja:'ウユニ塩湖に行きたいです。',pronunciation:'キエロ・イール・アル・サラール・デ・ウジュニ',tip:'ボリビア最大の観光名所。雨季は鏡張りの絶景',difficulty:1,region:'bolivia',situation:'ツアー会社で'},
+  {id:'sight_11',category:'sightseeing',es:'¿Hay descuento para estudiantes?',ja:'学生割引はありますか？',pronunciation:'アイ・デスクエント・パラ・エストゥディアンテス？',tip:'学生証があれば割引が効く場所が多い',difficulty:1,region:'common',situation:'チケット売り場で'},
+  {id:'sight_12',category:'sightseeing',es:'¿Se puede sacar fotos adentro?',ja:'中で写真を撮ってもいいですか？',pronunciation:'セ・プエデ・サカール・フォトス・アデントロ？',tip:'教会や博物館では撮影禁止の場所もある',difficulty:1,region:'common',situation:'博物館や教会の入口で'},
+  {id:'sight_13',category:'sightseeing',es:'¿Cómo llego a las ruinas de Tiwanaku?',ja:'ティワナク遺跡にはどうやって行けますか？',pronunciation:'コモ・ジェゴ・ア・ラス・ルイナス・デ・ティワナク？',tip:'ボリビアの世界遺産。ラパスからバスで行ける',difficulty:2,region:'bolivia',situation:'ホテルやツアー会社で'},
+  {id:'sight_14',category:'sightseeing',es:'¡Qué vista tan hermosa!',ja:'なんて美しい景色！',pronunciation:'ケ・ビスタ・タン・エルモサ！',tip:'感動を表すフレーズ。絶景ポイントで',difficulty:1,region:'common',situation:'景色に感動したとき'},
+  {id:'sight_15',category:'sightseeing',es:'¿Hay un mirador cerca de aquí?',ja:'この近くに展望台はありますか？',pronunciation:'アイ・ウン・ミラドール・セルカ・デ・アキ？',tip:'「mirador」＝展望台。街を一望できるスポット',difficulty:2,region:'common',situation:'街歩き中に'},
+
+  // ===== 仲良くなる (15) =====
+  {id:'friends_01',category:'friends',es:'¡Me encanta tu país!',ja:'あなたの国が大好きです！',pronunciation:'メ・エンカンタ・トゥ・パイス！',tip:'現地の人が一番喜ぶフレーズ',difficulty:1,region:'common',situation:'現地の人との会話で'},
+  {id:'friends_02',category:'friends',es:'La comida peruana es increíble.',ja:'ペルー料理は最高です。',pronunciation:'ラ・コミダ・ペルアナ・エス・インクレイブレ',tip:'食文化を褒めると喜ばれる',difficulty:1,region:'peru',situation:'食事の話題で'},
+  {id:'friends_03',category:'friends',es:'¿Tienes Instagram?',ja:'インスタグラムやってる？',pronunciation:'ティエネス・インスタグラム？',tip:'SNS交換は世界共通の友達の作り方',difficulty:1,region:'common',situation:'仲良くなった人に'},
+  {id:'friends_04',category:'friends',es:'¿Puedo agregar tu WhatsApp?',ja:'WhatsApp追加してもいい？',pronunciation:'プエド・アグレガール・トゥ・ワッツアップ？',tip:'中南米ではLINEではなくWhatsAppが主流',difficulty:1,region:'common',situation:'連絡先交換のとき'},
+  {id:'friends_05',category:'friends',es:'¡Salud!',ja:'乾杯！',pronunciation:'サルー！',tip:'お酒を飲むときの乾杯の掛け声。直訳は「健康」',difficulty:1,region:'common',situation:'お酒を飲む場で'},
+  {id:'friends_06',category:'friends',es:'¿Quieres tomar algo?',ja:'何か飲まない？',pronunciation:'キエレス・トマール・アルゴ？',tip:'相手を誘うカジュアルなフレーズ',difficulty:1,region:'common',situation:'知り合った人を誘うとき'},
+  {id:'friends_07',category:'friends',es:'Eres muy simpático/a.',ja:'あなたはとても感じがいいですね。',pronunciation:'エレス・ムイ・シンパティコ（男）/シンパティカ（女）',tip:'性格を褒める。相手の性別で語尾を変える',difficulty:1,region:'common',situation:'楽しい会話の後で'},
+  {id:'friends_08',category:'friends',es:'Fue un placer conocerte.',ja:'あなたに会えてよかったです。',pronunciation:'フエ・ウン・プラセール・コノセルテ',tip:'別れ際に使う丁寧で温かい表現',difficulty:2,region:'common',situation:'別れのとき'},
+  {id:'friends_09',category:'friends',es:'¿De dónde eres?',ja:'どこの出身ですか？',pronunciation:'デ・ドンデ・エレス？',tip:'旅先で出会った人との会話の定番',difficulty:1,region:'common',situation:'初対面の会話で'},
+  {id:'friends_10',category:'friends',es:'Me gustaría volver algún día.',ja:'いつかまた来たいです。',pronunciation:'メ・グスタリア・ボルベール・アルグン・ディア',tip:'旅の終わりに。再訪の意思を伝える温かいフレーズ',difficulty:2,region:'common',situation:'旅の最後に'},
+  {id:'friends_11',category:'friends',es:'¡Qué divertido!',ja:'楽しい！',pronunciation:'ケ・ディベルティード！',tip:'楽しい時間を過ごしているときに。感情表現は大事',difficulty:1,region:'common',situation:'楽しい体験のとき'},
+  {id:'friends_12',category:'friends',es:'Gracias por tu ayuda. Eres el/la mejor.',ja:'手伝ってくれてありがとう。あなたは最高です。',pronunciation:'グラシアス・ポル・トゥ・アジュダ。エレス・エル/ラ・メホール',tip:'深い感謝を伝える表現',difficulty:2,region:'common',situation:'大いに助けてもらったとき'},
+  {id:'friends_13',category:'friends',es:'¿Qué música te gusta?',ja:'どんな音楽が好きですか？',pronunciation:'ケ・ムシカ・テ・グスタ？',tip:'音楽の話題は盛り上がりやすい',difficulty:1,region:'common',situation:'会話を広げたいとき'},
+  {id:'friends_14',category:'friends',es:'Te invito. Yo pago.',ja:'おごるよ。僕が払います。',pronunciation:'テ・インビト。ジョ・パゴ',tip:'「invitar」は中南米で「おごる」の意味でよく使う',difficulty:1,region:'common',situation:'一緒に食事や飲みに行くとき'},
+  {id:'friends_15',category:'friends',es:'Espero que nos veamos de nuevo.',ja:'また会えることを願っています。',pronunciation:'エスペロ・ケ・ノス・ベアモス・デ・ヌエボ',tip:'旅先の出会いを大切にする言葉',difficulty:2,region:'common',situation:'お別れのとき'},
+
+  // ===== 現地スラング・慣用句 (18) =====
+  {id:'slang_01',category:'slang',es:'¡Chévere!',ja:'いいね！/最高！',pronunciation:'チェベレ！',tip:'ペルーで「すごい」「いいね」の意味。超頻出',difficulty:1,region:'peru',situation:'何かいいことがあったとき'},
+  {id:'slang_02',category:'slang',es:'¿Qué tal, pata?',ja:'調子どう、友達？',pronunciation:'ケ・タル・パタ？',tip:'「pata」はペルーで「友達」の意味（本来は足の意味）',difficulty:1,region:'peru',situation:'友達同士の挨拶'},
+  {id:'slang_03',category:'slang',es:'Está bacán.',ja:'超いい/かっこいい。',pronunciation:'エスタ・バカン',tip:'ペルーのスラングで「素晴らしい」。若者がよく使う',difficulty:1,region:'peru',situation:'何かを褒めるとき'},
+  {id:'slang_04',category:'slang',es:'¡Qué paja!',ja:'めんどくさい！/だるい！',pronunciation:'ケ・パハ！',tip:'ボリビアで「面倒」「だるい」の意味',difficulty:1,region:'bolivia',situation:'面倒なことがあったとき'},
+  {id:'slang_05',category:'slang',es:'Es jailón/a.',ja:'あの人はお金持ち風だ。',pronunciation:'エス・ハイロン/ハイロナ',tip:'ボリビアで「upper class」な感じの人を指す。やや皮肉',difficulty:2,region:'bolivia',situation:'人の見た目や態度について'},
+  {id:'slang_06',category:'slang',es:'No manches.',ja:'マジで？/うそでしょ？',pronunciation:'ノ・マンチェス',tip:'驚きの表現。「No me digas」と同じニュアンス',difficulty:1,region:'common',situation:'驚いたとき'},
+  {id:'slang_07',category:'slang',es:'¡Asu!',ja:'うわっ！/マジか！',pronunciation:'アス！',tip:'ペルーの感嘆表現。驚き・感動・呆れに使える万能ワード',difficulty:1,region:'peru',situation:'驚いたとき'},
+  {id:'slang_08',category:'slang',es:'Habla, causa.',ja:'よう、相棒。',pronunciation:'アブラ・カウサ',tip:'リマの若者言葉で「causa」＝親友。「habla」は挨拶',difficulty:2,region:'peru',situation:'親しい友人への挨拶'},
+  {id:'slang_09',category:'slang',es:'Está yapa.',ja:'おまけちょうだい。',pronunciation:'エスタ・ジャパ',tip:'市場で買い物したとき「yapa」（おまけ）をもらう文化がある',difficulty:1,region:'common',situation:'市場で買い物した後'},
+  {id:'slang_10',category:'slang',es:'¡Pucha!',ja:'しまった！/くそっ！',pronunciation:'プチャ！',tip:'軽い悪態。「puta」の婉曲表現で比較的マイルド',difficulty:1,region:'common',situation:'失敗やがっかりしたとき'},
+  {id:'slang_11',category:'slang',es:'Estoy choborra.',ja:'酔っ払った。',pronunciation:'エストイ・チョボーラ',tip:'ボリビアのスラングで「酔った」の意味',difficulty:2,region:'bolivia',situation:'飲み会で'},
+  {id:'slang_12',category:'slang',es:'¡Qué chola más linda!',ja:'なんてきれいなチョリータ！',pronunciation:'ケ・チョラ・マス・リンダ！',tip:'ボリビアの伝統衣装を着た女性への褒め言葉。文脈に注意',difficulty:3,region:'bolivia',situation:'伝統衣装の女性を見て（親しい場面で）'},
+  {id:'slang_13',category:'slang',es:'Vamos a chupar.',ja:'飲みに行こう。',pronunciation:'バモス・ア・チュパール',tip:'「chupar」はスラングで「酒を飲む」。カジュアルな表現',difficulty:2,region:'common',situation:'友達を飲みに誘うとき'},
+  {id:'slang_14',category:'slang',es:'Tengo chuchaqui.',ja:'二日酔いだ。',pronunciation:'テンゴ・チュチャキ',tip:'ボリビア・エクアドルで「二日酔い」。ケチュア語由来',difficulty:2,region:'bolivia',situation:'飲みすぎた翌朝'},
+  {id:'slang_15',category:'slang',es:'¡A su madre!',ja:'マジかよ！（強い驚き）',pronunciation:'ア・ス・マドレ！',tip:'ペルーの驚きの表現。かなりカジュアル',difficulty:2,region:'peru',situation:'非常に驚いたとき'},
+  {id:'slang_16',category:'slang',es:'Está misio.',ja:'金欠だ。',pronunciation:'エスタ・ミシオ',tip:'ペルーのスラングで「お金がない」状態',difficulty:2,region:'peru',situation:'お金の話題で'},
+  {id:'slang_17',category:'slang',es:'¿Qué onda?',ja:'調子どう？/何してる？',pronunciation:'ケ・オンダ？',tip:'カジュアルな挨拶。中南米全般で使われる',difficulty:1,region:'common',situation:'友達への挨拶'},
+  {id:'slang_18',category:'slang',es:'¡Ya pe!',ja:'そうだよ！/もう！',pronunciation:'ジャ・ペ！',tip:'ペルー独特の口癖。「ya pues」の省略形。同意や焦りに',difficulty:1,region:'peru',situation:'同意するときや急かすとき'}
+];
+
+// ===================== アプリ状態 =====================
+let state = {
+  learnedPhrases: [],
+  drillHistory: [],
+  settings: { speechRate: 1.0 },
+  currentCategory: null,
+  currentPhraseIndex: 0,
+  currentPhraseList: [],
+  drillCorrect: 0,
+  drillTotal: 0,
+  drillStreak: 0,
+  drillMaxStreak: 0,
+  drillPhrase: null,
+  slangFilter: 'all',
+  previousScreen: 'home'
+};
+
+// ===================== localStorage =====================
+function loadState() {
+  try {
+    const saved = localStorage.getItem('hablemos_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.learnedPhrases = parsed.learnedPhrases || [];
+      state.drillHistory = parsed.drillHistory || [];
+      state.settings = parsed.settings || { speechRate: 1.0 };
+    }
+  } catch(e) {}
+}
+function saveState() {
+  try {
+    localStorage.setItem('hablemos_state', JSON.stringify({
+      learnedPhrases: state.learnedPhrases,
+      drillHistory: state.drillHistory,
+      settings: state.settings
+    }));
+  } catch(e) {}
+}
+
+// ===================== 画面切り替え =====================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screenId = name === 'home' ? 'home-screen' :
+                   name === 'category' ? 'category-screen' :
+                   name === 'phrase' ? 'phrase-screen' :
+                   name === 'slang' ? 'slang-screen' :
+                   name === 'drill' ? 'drill-screen' : 'home-screen';
+  document.getElementById(screenId).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const navIndex = name === 'home' || name === 'category' || name === 'phrase' ? 0 :
+                   name === 'slang' ? 1 : name === 'drill' ? 2 : 0;
+  document.querySelectorAll('.nav-btn')[navIndex].classList.add('active');
+  window.scrollTo(0, 0);
+  stopSpeaking();
+  stopRecognition();
+  if (name === 'home') renderHome();
+  if (name === 'slang') renderSlang();
+  if (name === 'drill') { resetDrill(); startDrill(); }
+}
+
+// ===================== ホーム画面 =====================
+const HERO_PHOTOS = [
+  {url:'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=800&q=80',title:'Machu Picchu, Perú',desc:'インカ帝国の空中都市'},
+  {url:'https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=800&q=80',title:'Cusco, Perú',desc:'かつてのインカ帝国の首都'},
+  {url:'https://images.unsplash.com/photo-1531065208531-4036c0dba3ca?w=800&q=80',title:'Salar de Uyuni, Bolivia',desc:'世界最大の塩湖'},
+  {url:'https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=800&q=80',title:'Valle Sagrado, Perú',desc:'聖なる谷の絶景'},
+  {url:'https://images.unsplash.com/photo-1548820352-b877f1ba22a2?w=800&q=80',title:'Lima, Perú',desc:'南米のグルメ首都'}
+];
+let heroIndex = 0;
+let heroInterval = null;
+
+function initHero() {
+  const dotsEl = document.getElementById('hero-dots');
+  dotsEl.innerHTML = HERO_PHOTOS.map((_, i) =>
+    `<div class="hero-dot ${i === 0 ? 'active' : ''}" onclick="setHero(${i})"></div>`
+  ).join('');
+  setHero(0);
+  heroInterval = setInterval(() => {
+    heroIndex = (heroIndex + 1) % HERO_PHOTOS.length;
+    setHero(heroIndex);
+  }, 5000);
+}
+
+function setHero(idx) {
+  heroIndex = idx;
+  const photo = HERO_PHOTOS[idx];
+  const img = document.getElementById('hero-img');
+  img.style.opacity = '0';
+  setTimeout(() => {
+    img.src = photo.url;
+    img.onload = () => { img.style.opacity = '1'; };
+  }, 300);
+  document.getElementById('hero-title').textContent = photo.title;
+  document.getElementById('hero-desc').textContent = photo.desc;
+  document.querySelectorAll('.hero-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+function renderHome() {
+  const learnedCount = state.learnedPhrases.length;
+  const totalCount = PHRASES.length;
+  document.getElementById('learned-count').textContent = learnedCount;
+  document.getElementById('total-count').textContent = totalCount;
+  const pct = totalCount > 0 ? Math.round(learnedCount / totalCount * 100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  const history = state.drillHistory;
+  if (history.length > 0) {
+    const last = history[history.length - 1];
+    document.getElementById('drill-score').textContent = last.score + '%';
+  }
+  // 今日のひとこと
+  const dailyPhrases = PHRASES.filter(p => p.difficulty <= 2);
+  const today = new Date();
+  const dayIndex = (today.getFullYear() * 366 + today.getMonth() * 31 + today.getDate()) % dailyPhrases.length;
+  const dp = dailyPhrases[dayIndex];
+  document.getElementById('daily-phrase').innerHTML = `
+    <div class="tag">✨ 今日のひとこと</div>
+    <div class="es">${dp.es}</div>
+    <div class="ja">${dp.ja}</div>
+  `;
+  // カテゴリグリッド
+  const grid = document.getElementById('category-grid');
+  grid.innerHTML = CATEGORIES.map(cat => {
+    const catPhrases = PHRASES.filter(p => p.category === cat.id);
+    const catLearned = catPhrases.filter(p => state.learnedPhrases.includes(p.id)).length;
+    const catPct = catPhrases.length > 0 ? Math.round(catLearned / catPhrases.length * 100) : 0;
+    return `
+      <div class="category-card" onclick="openCategory('${cat.id}')">
+        <div class="tape"></div>
+        <div class="emoji">${cat.emoji}</div>
+        <div class="name">${cat.name}</div>
+        <div class="count">${catLearned}/${catPhrases.length} フレーズ</div>
+        <div class="cat-progress"><div class="cat-progress-fill" style="width:${catPct}%"></div></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===================== カテゴリ画面 =====================
+function openCategory(catId) {
+  state.currentCategory = catId;
+  state.previousScreen = 'category';
+  const cat = CATEGORIES.find(c => c.id === catId);
+  document.getElementById('cat-emoji').textContent = cat.emoji;
+  document.getElementById('cat-title').textContent = cat.name;
+  const catPhrases = PHRASES.filter(p => p.category === catId);
+  document.getElementById('cat-desc').textContent = catPhrases.length + ' フレーズ';
+  const list = document.getElementById('phrase-list');
+  list.innerHTML = catPhrases.map((p, i) => {
+    const isLearned = state.learnedPhrases.includes(p.id);
+    return `
+      <div class="phrase-item" onclick="openPhrase('${catId}',${i})">
+        <div class="diff d${p.difficulty}"></div>
+        <div class="phrase-text">
+          <div class="phrase-es">${p.es}</div>
+          <div class="phrase-ja">${p.ja}</div>
+        </div>
+        ${isLearned ? '<div class="learned-badge">✅</div>' : ''}
+      </div>
+    `;
+  }).join('');
+  showScreen('category');
+}
+
+// ===================== フレーズ詳細画面 =====================
+function openPhrase(catId, index) {
+  state.currentCategory = catId;
+  state.currentPhraseList = PHRASES.filter(p => p.category === catId);
+  state.currentPhraseIndex = index;
+  renderPhrase();
+  showScreen('phrase');
+}
+
+function renderPhrase() {
+  const p = state.currentPhraseList[state.currentPhraseIndex];
+  if (!p) return;
+  const isLearned = state.learnedPhrases.includes(p.id);
+  const regionLabel = p.region === 'peru' ? '🇵🇪 ペルー' : p.region === 'bolivia' ? '🇧🇴 ボリビア' : '🌎 共通';
+  document.getElementById('phrase-counter').textContent =
+    `${state.currentPhraseIndex + 1} / ${state.currentPhraseList.length}`;
+  document.getElementById('phrase-detail').innerHTML = `
+    <div class="phrase-card">
+      <span class="region-tag">${regionLabel}</span>
+      <div class="es-text" id="es-highlight">${p.es}</div>
+      <div class="ja-text">${p.ja}</div>
+      <div class="pronunciation">
+        <div class="label">🗣 発音ガイド</div>
+        <div class="kana">${p.pronunciation}</div>
+      </div>
+      <div class="tip">💡 ${p.tip}</div>
+      <div class="situation">📍 ${p.situation}</div>
+    </div>
+  `;
+  document.getElementById('action-btns').innerHTML = `
+    <button class="action-btn btn-listen" onclick="speakPhrase()">🔊 聴く</button>
+    <button class="action-btn btn-speak" id="speak-btn" onclick="startRecognition()">🎤 話す</button>
+    <button class="action-btn btn-learned ${isLearned ? 'is-learned' : ''}" onclick="toggleLearned('${p.id}')">
+      ${isLearned ? '✅ 覚えた' : '☐ 覚えた'}
+    </button>
+  `;
+  document.getElementById('prev-btn').disabled = state.currentPhraseIndex === 0;
+  document.getElementById('next-btn').disabled = state.currentPhraseIndex >= state.currentPhraseList.length - 1;
+  document.getElementById('recognition-result').classList.remove('show');
+  document.getElementById('recording-indicator').classList.remove('show');
+  // Speech Recognition 非対応チェック
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    const speakBtn = document.getElementById('speak-btn');
+    if (speakBtn) speakBtn.style.display = 'none';
+  }
+  updateSpeedButtons();
+}
+
+function goBackFromPhrase() {
+  if (state.previousScreen === 'drill') {
+    showScreen('drill');
+  } else {
+    openCategory(state.currentCategory);
+  }
+}
+
+function navPhrase(dir) {
+  state.currentPhraseIndex += dir;
+  state.currentPhraseIndex = Math.max(0, Math.min(state.currentPhraseIndex, state.currentPhraseList.length - 1));
+  renderPhrase();
+  // スクロール上へ
+  document.getElementById('phrase-screen').scrollTo(0, 0);
+}
+
+function toggleLearned(phraseId) {
+  const idx = state.learnedPhrases.indexOf(phraseId);
+  if (idx >= 0) {
+    state.learnedPhrases.splice(idx, 1);
+  } else {
+    state.learnedPhrases.push(phraseId);
+    showConfetti();
+  }
+  saveState();
+  renderPhrase();
+}
+
+// スワイプ対応
+let touchStartX = 0;
+let touchStartY = 0;
+document.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!document.getElementById('phrase-screen').classList.contains('active')) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx < 0 && state.currentPhraseIndex < state.currentPhraseList.length - 1) navPhrase(1);
+    if (dx > 0 && state.currentPhraseIndex > 0) navPhrase(-1);
+  }
+});
+
+// ===================== Speech Synthesis =====================
+let currentUtterance = null;
+
+function getSpanishVoice() {
+  const voices = speechSynthesis.getVoices();
+  let voice = voices.find(v => v.lang === 'es-419' || v.lang.startsWith('es-4'));
+  if (!voice) voice = voices.find(v => v.lang === 'es-MX');
+  if (!voice) voice = voices.find(v => v.lang.startsWith('es-'));
+  if (!voice) voice = voices.find(v => v.lang === 'es-ES');
+  return voice;
+}
+
+function speakPhrase() {
+  const p = state.currentPhraseList[state.currentPhraseIndex];
+  if (!p) return;
+  stopSpeaking();
+  const utterance = new SpeechSynthesisUtterance(p.es);
+  const voice = getSpanishVoice();
+  if (voice) utterance.voice = voice;
+  utterance.lang = 'es-419';
+  utterance.rate = state.settings.speechRate;
+  utterance.pitch = 1;
+  currentUtterance = utterance;
+  speechSynthesis.speak(utterance);
+}
+
+function speakText(text) {
+  stopSpeaking();
+  const utterance = new SpeechSynthesisUtterance(text);
+  const voice = getSpanishVoice();
+  if (voice) utterance.voice = voice;
+  utterance.lang = 'es-419';
+  utterance.rate = state.settings.speechRate;
+  currentUtterance = utterance;
+  speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+  speechSynthesis.cancel();
+  currentUtterance = null;
+}
+
+function setSpeed(rate) {
+  state.settings.speechRate = rate;
+  saveState();
+  updateSpeedButtons();
+}
+
+function updateSpeedButtons() {
+  document.querySelectorAll('.speed-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  const btns = document.querySelectorAll('.speed-btn');
+  if (state.settings.speechRate >= 0.9) btns[0]?.classList.add('active');
+  else btns[1]?.classList.add('active');
+}
+
+// voice list が非同期でロードされる場合
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => {};
+}
+
+// ===================== Speech Recognition =====================
+let recognition = null;
+
+function startRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return;
+  stopRecognition();
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-419';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  document.getElementById('recording-indicator').classList.add('show');
+  document.getElementById('recognition-result').classList.remove('show');
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    showRecognitionResult(transcript);
+  };
+  recognition.onerror = (event) => {
+    document.getElementById('recording-indicator').classList.remove('show');
+    if (event.error !== 'no-speech') {
+      document.getElementById('recognition-result').innerHTML =
+        `<div class="feedback" style="color:var(--text-light)">音声を認識できませんでした。もう一度試してください。</div>`;
+      document.getElementById('recognition-result').classList.add('show');
+    }
+  };
+  recognition.onend = () => {
+    document.getElementById('recording-indicator').classList.remove('show');
+  };
+  recognition.start();
+}
+
+function stopRecognition() {
+  if (recognition) {
+    try { recognition.abort(); } catch(e) {}
+    recognition = null;
+  }
+  document.getElementById('recording-indicator')?.classList.remove('show');
+}
+
+function showRecognitionResult(transcript) {
+  const p = state.currentPhraseList[state.currentPhraseIndex];
+  if (!p) return;
+  const score = calcSimilarity(normalize(p.es), normalize(transcript));
+  const scorePct = Math.round(score * 100);
+  let feedback, feedbackColor;
+  if (scorePct >= 80) { feedback = '¡Muy bien! 🎉'; feedbackColor = 'var(--green)'; showConfetti(); }
+  else if (scorePct >= 50) { feedback = '¡Casi! もう少し！ 💪'; feedbackColor = '#FF9800'; }
+  else { feedback = 'Otra vez（もう一回）🔄'; feedbackColor = 'var(--red)'; }
+  const diffHtml = generateDiff(p.es, transcript);
+  const resultEl = document.getElementById('recognition-result');
+  resultEl.innerHTML = `
+    <div class="score" style="color:${feedbackColor}">${scorePct}%</div>
+    <div class="feedback" style="color:${feedbackColor}">${feedback}</div>
+    <div style="font-size:.75rem;color:var(--text-light);margin-bottom:8px">あなたの発音：</div>
+    <div class="diff-display">${diffHtml}</div>
+  `;
+  resultEl.classList.add('show');
+}
+
+function normalize(text) {
+  return text.toLowerCase()
+    .replace(/[¿¡.,!?;:'"]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function calcSimilarity(a, b) {
+  if (a === b) return 1;
+  const wordsA = a.split(' ');
+  const wordsB = b.split(' ');
+  const maxLen = Math.max(wordsA.length, wordsB.length);
+  if (maxLen === 0) return 1;
+  const dist = levenshteinWords(wordsA, wordsB);
+  return Math.max(0, 1 - dist / maxLen);
+}
+
+function levenshteinWords(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+    }
+  }
+  return dp[m][n];
+}
+
+function generateDiff(original, transcript) {
+  const origWords = original.split(/\s+/);
+  const transWords = transcript.split(/\s+/);
+  let html = '';
+  const maxLen = Math.max(origWords.length, transWords.length);
+  for (let i = 0; i < maxLen; i++) {
+    const ow = origWords[i] || '';
+    const tw = transWords[i] || '';
+    if (normalize(ow) === normalize(tw)) {
+      html += `<span class="diff-match">${tw}</span> `;
+    } else if (tw) {
+      html += `<span class="diff-miss">${tw}</span> `;
+    }
+  }
+  return html.trim();
+}
+
+// ===================== 慣用句辞典 =====================
+function renderSlang() {
+  const searchVal = (document.getElementById('slang-search-input')?.value || '').toLowerCase();
+  const filter = state.slangFilter;
+  let phrases = PHRASES.filter(p => p.category === 'slang');
+  if (filter !== 'all') {
+    phrases = phrases.filter(p => p.region === filter);
+  }
+  if (searchVal) {
+    phrases = phrases.filter(p =>
+      p.es.toLowerCase().includes(searchVal) ||
+      p.ja.includes(searchVal) ||
+      p.tip.includes(searchVal)
+    );
+  }
+  const list = document.getElementById('slang-list');
+  list.innerHTML = phrases.map(p => {
+    const regionClass = p.region === 'peru' ? 'peru' : p.region === 'bolivia' ? 'bolivia' : 'common';
+    const regionLabel = p.region === 'peru' ? '🇵🇪 ペルー' : p.region === 'bolivia' ? '🇧🇴 ボリビア' : '🌎 共通';
+    return `
+      <div class="slang-item">
+        <div class="slang-es">${p.es}</div>
+        <div class="slang-ja">${p.ja}</div>
+        <div class="slang-tip">${p.tip}</div>
+        <span class="slang-region ${regionClass}">${regionLabel}</span>
+      </div>
+    `;
+  }).join('');
+  if (phrases.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-light)">該当する慣用句がありません</div>';
+  }
+}
+
+function filterSlang() { renderSlang(); }
+
+function setSlangFilter(f) {
+  state.slangFilter = f;
+  document.querySelectorAll('#slang-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderSlang();
+}
+
+// ===================== 発音ドリル =====================
+function resetDrill() {
+  state.drillCorrect = 0;
+  state.drillTotal = 0;
+  state.drillStreak = 0;
+  state.drillMaxStreak = 0;
+  updateDrillStats();
+}
+
+function startDrill() {
+  document.getElementById('drill-result').classList.remove('show');
+  const available = PHRASES.filter(p => p.category !== 'slang');
+  state.drillPhrase = available[Math.floor(Math.random() * available.length)];
+  const dp = state.drillPhrase;
+  document.getElementById('drill-card').innerHTML = `
+    <div class="drill-es">${dp.es}</div>
+    <div class="drill-ja">${dp.ja}</div>
+  `;
+  // Speech Recognition 非対応チェック
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    const drillSpeakBtn = document.getElementById('drill-speak-btn');
+    if (drillSpeakBtn) drillSpeakBtn.style.display = 'none';
+  }
+}
+
+function drillListen() {
+  if (!state.drillPhrase) return;
+  speakText(state.drillPhrase.es);
+}
+
+function drillSpeak() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition || !state.drillPhrase) return;
+  stopRecognition();
+  recognition = new SpeechRecognition();
+  recognition.lang = 'es-419';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  const card = document.getElementById('drill-card');
+  card.style.borderColor = 'var(--terra)';
+  card.style.border = '3px solid var(--terra)';
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    showDrillResult(transcript);
+    card.style.border = 'none';
+  };
+  recognition.onerror = () => {
+    card.style.border = 'none';
+  };
+  recognition.onend = () => {
+    card.style.border = 'none';
+  };
+  recognition.start();
+}
+
+function showDrillResult(transcript) {
+  const p = state.drillPhrase;
+  if (!p) return;
+  const score = calcSimilarity(normalize(p.es), normalize(transcript));
+  const scorePct = Math.round(score * 100);
+  state.drillTotal++;
+  let feedback, feedbackColor;
+  if (scorePct >= 80) {
+    state.drillCorrect++;
+    state.drillStreak++;
+    state.drillMaxStreak = Math.max(state.drillMaxStreak, state.drillStreak);
+    feedback = '¡Muy bien! 🎉';
+    feedbackColor = 'var(--green)';
+    showConfetti();
+  } else if (scorePct >= 50) {
+    state.drillStreak = 0;
+    feedback = '¡Casi! もう少し！ 💪';
+    feedbackColor = '#FF9800';
+  } else {
+    state.drillStreak = 0;
+    feedback = 'Otra vez 🔄';
+    feedbackColor = 'var(--red)';
+  }
+  updateDrillStats();
+  const diffHtml = generateDiff(p.es, transcript);
+  const resultEl = document.getElementById('drill-result');
+  resultEl.innerHTML = `
+    <div class="score" style="color:${feedbackColor};font-family:'Caveat',cursive;font-size:2.5rem">${scorePct}%</div>
+    <div class="feedback" style="color:${feedbackColor};font-weight:700;margin-bottom:8px">${feedback}</div>
+    ${state.drillStreak >= 3 ? `<div style="margin-bottom:12px"><span class="streak-badge">🔥 ${state.drillStreak}連続正解！</span></div>` : ''}
+    <div style="font-size:.75rem;color:var(--text-light);margin-bottom:6px">あなたの発音：</div>
+    <div class="diff-display" style="font-size:.9rem;line-height:1.8">${diffHtml}</div>
+    <button class="action-btn" style="background:var(--indigo);color:#fff;margin-top:16px;display:inline-flex" onclick="startDrill()">次の問題 →</button>
+  `;
+  resultEl.classList.add('show');
+  // ドリル履歴を保存
+  if (state.drillTotal > 0 && state.drillTotal % 5 === 0) {
+    state.drillHistory.push({
+      date: new Date().toISOString().slice(0, 10),
+      score: Math.round(state.drillCorrect / state.drillTotal * 100),
+      count: state.drillTotal
+    });
+    saveState();
+  }
+}
+
+function drillSkip() {
+  startDrill();
+}
+
+function updateDrillStats() {
+  document.getElementById('drill-correct').textContent = state.drillCorrect;
+  document.getElementById('drill-total').textContent = state.drillTotal;
+  document.getElementById('drill-streak').textContent = state.drillStreak;
+}
+
+// ===================== 祝福エフェクト =====================
+function showConfetti() {
+  const container = document.getElementById('confetti-container');
+  const colors = ['#C75B39', '#2B4C7E', '#4CAF50', '#FF9800', '#FFD700', '#E53935'];
+  for (let i = 0; i < 30; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + '%';
+    confetti.style.top = '-10px';
+    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+    confetti.style.animationDuration = (1 + Math.random()) + 's';
+    container.appendChild(confetti);
+    setTimeout(() => confetti.remove(), 2000);
+  }
+}
+
+// ===================== 初期化 =====================
+loadState();
+// voicesが非同期ロードされるのを待つ
+speechSynthesis.getVoices();
+renderHome();
+initHero();
+</script>
+</body>
+</html>
