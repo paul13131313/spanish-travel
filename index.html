@@ -854,9 +854,11 @@ function renderPhrase() {
       <div class="situation">📍 ${p.situation}</div>
     </div>
   `;
+  const speakLabel = hasSpeechRecognition ? '🎤 話す' : '✏️ 入力';
+  const speakClass = hasSpeechRecognition ? 'btn-speak' : 'btn-speak';
   document.getElementById('action-btns').innerHTML = `
     <button class="action-btn btn-listen" onclick="speakPhrase()">🔊 聴く</button>
-    <button class="action-btn btn-speak" id="speak-btn" onclick="startRecognition()">🎤 話す</button>
+    <button class="action-btn ${speakClass}" id="speak-btn" onclick="startRecognition()">${speakLabel}</button>
     <button class="action-btn btn-learned ${isLearned ? 'is-learned' : ''}" onclick="toggleLearned('${p.id}')">
       ${isLearned ? '✅ 覚えた' : '☐ 覚えた'}
     </button>
@@ -865,11 +867,6 @@ function renderPhrase() {
   document.getElementById('next-btn').disabled = state.currentPhraseIndex >= state.currentPhraseList.length - 1;
   document.getElementById('recognition-result').classList.remove('show');
   document.getElementById('recording-indicator').classList.remove('show');
-  // Speech Recognition 非対応チェック
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    const speakBtn = document.getElementById('speak-btn');
-    if (speakBtn) speakBtn.style.display = 'none';
-  }
   updateSpeedButtons();
 }
 
@@ -983,9 +980,15 @@ if (speechSynthesis.onvoiceschanged !== undefined) {
 // ===================== Speech Recognition =====================
 let recognition = null;
 
+const hasSpeechRecognition = ('SpeechRecognition' in window) || ('webkitSpeechRecognition' in window);
+
 function startRecognition() {
+  if (!hasSpeechRecognition) {
+    // 非対応ブラウザ：手動入力フォールバック
+    showManualInput();
+    return;
+  }
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return;
   stopRecognition();
   recognition = new SpeechRecognition();
   recognition.lang = 'es-419';
@@ -999,7 +1002,7 @@ function startRecognition() {
   };
   recognition.onerror = (event) => {
     document.getElementById('recording-indicator').classList.remove('show');
-    if (event.error !== 'no-speech') {
+    if (event.error !== 'no-speech' && event.error !== 'aborted') {
       document.getElementById('recognition-result').innerHTML =
         `<div class="feedback" style="color:var(--text-light)">音声を認識できませんでした。もう一度試してください。</div>`;
       document.getElementById('recognition-result').classList.add('show');
@@ -1008,7 +1011,35 @@ function startRecognition() {
   recognition.onend = () => {
     document.getElementById('recording-indicator').classList.remove('show');
   };
-  recognition.start();
+  try {
+    recognition.start();
+  } catch(e) {
+    showManualInput();
+  }
+}
+
+function showManualInput() {
+  const p = state.currentPhraseList[state.currentPhraseIndex];
+  if (!p) return;
+  const resultEl = document.getElementById('recognition-result');
+  resultEl.innerHTML = `
+    <div style="font-size:.85rem;font-weight:700;margin-bottom:8px;color:var(--indigo)">✏️ タイプして発音チェック</div>
+    <div style="font-size:.7rem;color:var(--text-light);margin-bottom:10px">このブラウザは音声認識に非対応です。スペイン語を入力して答え合わせしましょう。</div>
+    <input type="text" id="manual-input" placeholder="スペイン語を入力..."
+      style="width:100%;padding:12px;border:2px solid var(--indigo);border-radius:8px;font-size:1rem;font-family:'Noto Sans JP',sans-serif;background:var(--sand)">
+    <button onclick="checkManualInput()"
+      style="margin-top:10px;width:100%;padding:12px;background:var(--terra);color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif">
+      チェック ✓
+    </button>
+  `;
+  resultEl.classList.add('show');
+  setTimeout(() => document.getElementById('manual-input')?.focus(), 100);
+}
+
+function checkManualInput() {
+  const input = document.getElementById('manual-input');
+  if (!input || !input.value.trim()) return;
+  showRecognitionResult(input.value.trim());
 }
 
 function stopRecognition() {
@@ -1147,10 +1178,10 @@ function startDrill() {
     <div class="drill-es">${dp.es}</div>
     <div class="drill-ja">${dp.ja}</div>
   `;
-  // Speech Recognition 非対応チェック
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    const drillSpeakBtn = document.getElementById('drill-speak-btn');
-    if (drillSpeakBtn) drillSpeakBtn.style.display = 'none';
+  // Speech Recognition 非対応 → ラベル変更
+  const drillSpeakBtn = document.getElementById('drill-speak-btn');
+  if (drillSpeakBtn && !hasSpeechRecognition) {
+    drillSpeakBtn.textContent = '✏️ 入力';
   }
 }
 
@@ -1160,15 +1191,18 @@ function drillListen() {
 }
 
 function drillSpeak() {
+  if (!state.drillPhrase) return;
+  if (!hasSpeechRecognition) {
+    showDrillManualInput();
+    return;
+  }
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition || !state.drillPhrase) return;
   stopRecognition();
   recognition = new SpeechRecognition();
   recognition.lang = 'es-419';
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
   const card = document.getElementById('drill-card');
-  card.style.borderColor = 'var(--terra)';
   card.style.border = '3px solid var(--terra)';
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
@@ -1181,7 +1215,33 @@ function drillSpeak() {
   recognition.onend = () => {
     card.style.border = 'none';
   };
-  recognition.start();
+  try {
+    recognition.start();
+  } catch(e) {
+    card.style.border = 'none';
+    showDrillManualInput();
+  }
+}
+
+function showDrillManualInput() {
+  const resultEl = document.getElementById('drill-result');
+  resultEl.innerHTML = `
+    <div style="font-size:.85rem;font-weight:700;margin-bottom:8px;color:var(--indigo)">✏️ タイプして発音チェック</div>
+    <input type="text" id="drill-manual-input" placeholder="スペイン語を入力..."
+      style="width:100%;padding:12px;border:2px solid var(--indigo);border-radius:8px;font-size:1rem;font-family:'Noto Sans JP',sans-serif;background:var(--sand)">
+    <button onclick="checkDrillManualInput()"
+      style="margin-top:10px;width:100%;padding:12px;background:var(--terra);color:#fff;border:none;border-radius:8px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Noto Sans JP',sans-serif">
+      チェック ✓
+    </button>
+  `;
+  resultEl.classList.add('show');
+  setTimeout(() => document.getElementById('drill-manual-input')?.focus(), 100);
+}
+
+function checkDrillManualInput() {
+  const input = document.getElementById('drill-manual-input');
+  if (!input || !input.value.trim()) return;
+  showDrillResult(input.value.trim());
 }
 
 function showDrillResult(transcript) {
